@@ -70,11 +70,11 @@ namespace HomeWork.Services
             return await userRepository.GetUserAsync(id);
         }
 
-        public async Task<SelectList> GetUsersAsync()
+        public async Task<SelectList> GetUsersAsync(string dataVaueString,string dataTextField)
         {
             var users = await userRepository.GetUsersAsync();
 
-            var selectListUsers = new SelectList(users, "ID", "FirstName");
+            var selectListUsers = new SelectList(users, dataVaueString, dataTextField);
 
             return selectListUsers;
         }

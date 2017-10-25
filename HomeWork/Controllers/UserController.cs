@@ -14,11 +14,12 @@ namespace HomeWork.Controllers
         {
             this.userService = userService;
         }
-
+        //
+        // GET: /User/index
         #region listUsers
         public async Task<ActionResult> Index()
         {
-            var users = await userService.GetUsersAsync();
+            var users = await userService.GetUsersAsync("ID","FirstName");
 
             var indexModel = new IndexViewModel()
             {
@@ -26,7 +27,7 @@ namespace HomeWork.Controllers
             };
             return View(indexModel);
         }
-
+        // POST:
         //redirect to EditAction
         [HttpPost]
         public ActionResult Index(UserInfo model)
@@ -107,7 +108,6 @@ namespace HomeWork.Controllers
         }
         #endregion
 
-
         private ActionResult RedirectToLocal(string url)
         {
             if (Url.IsLocalUrl(url))
@@ -117,6 +117,7 @@ namespace HomeWork.Controllers
             return RedirectToAction("Index", "User");
         }
 
+        //GET:
         public async Task<JsonResult> GetCities(int id)
         {
             var selectListCities = await userService.GetCitiesAsync(id, "ID", "Name");
@@ -130,12 +131,12 @@ namespace HomeWork.Controllers
         {
             await userService.DeleteUserAsync(id);
 
-            var selectListUsers = await userService.GetUsersAsync();
+            var selectListUsers = await userService.GetUsersAsync("ID","FirstName");
 
             return Json(selectListUsers, JsonRequestBehavior.AllowGet);
         }
         #endregion
-
+        //GET:
         public async Task<ActionResult> DetailsUser(int id)
         {
             var userInfo = await userService.GetUserAsync(id);
