@@ -1,0 +1,52 @@
+﻿@model HomeWork.Models.IndexViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<h2>List Users</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="User-container">
+        <div class="row">
+            <div class="col-xs-5">
+                @Html.ListBoxFor(model => model.FirstName, Model.userList as SelectList, new { @class = "form-control", @size = "20", @id = "listUsers" })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-xs-1">
+            </div>
+            <div class="col-xs-5">
+                <div id="user_content"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-horizontal" style="margin-top: 50px">
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser","User")'" value="Add" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="submit" class="btn btn-default" value="Edit" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="button" class="btn btn-default" id="DelUser" value="Delete" />
+            </div>
+        </div>
+    </div>
+<script src="~/Scripts/list.users.js"></script>
+    <script>
+        urlRefreshList = '@Url.Action("DeleteUser", "User")';
+        urlDetails = '@Url.Action("DetailsUser", "User")';
+    </script>
+
+}
