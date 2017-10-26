@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using System.Collections.Generic;
 
 namespace HomeWork.Models
 {
@@ -12,6 +9,10 @@ namespace HomeWork.Models
         [Required(ErrorMessage = "Please select user")]
         public string FirstName { get; set; }
         public SelectList userList { get; set; }
+        public string LastName { get; set; }
+        public int MaxShowUser { get; set; }
+        public List<UserInfo> listusers { get; set; }
+        public int id { get; set; }
     }
 
     public class EditViewModel

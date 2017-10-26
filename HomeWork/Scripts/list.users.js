@@ -21,3 +21,17 @@ $("#listUsers").on("click", "option", function () {
     var val = $(this).val();
     $("#user_content").load(urlDetails, { id: val });
 });
+
+$('a[href="#"]').click(function () {
+    var val = $(this).attr('UserID');
+    $("#user_content").load(urlDetails, { id: val });
+});
+
+$('.nav li').on('click', function () {
+    var val = $(this).attr('UserID');
+    $("#id").attr('value', val);
+    alert("123");
+    $('.nav li').removeClass('active');
+    $(this).addClass('active');
+});
+

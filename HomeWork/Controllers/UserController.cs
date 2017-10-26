@@ -2,6 +2,8 @@
 using HomeWork.Models;
 using System.Threading.Tasks;
 using HomeWork.Services;
+using HomeWork.Repositories;
+using System.Collections.Generic;
 
 namespace HomeWork.Controllers
 {
@@ -9,10 +11,12 @@ namespace HomeWork.Controllers
     {
         //unity inject
         private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,IUserRepository userRepository)
         {
             this.userService = userService;
+            this.userRepository = userRepository;
         }
         //
         // GET: /User/index
@@ -20,21 +24,30 @@ namespace HomeWork.Controllers
         public async Task<ActionResult> Index()
         {
             var users = await userService.GetUsersAsync("ID","FirstName");
+            var _users = await userRepository.GetUsersAsync();
+            
+            ViewBag.Users = _users;
+            List<UserInfo> s = _users as List<UserInfo>;
 
             var indexModel = new IndexViewModel()
             {
-                userList = users
+                MaxShowUser = 4,
+                userList = users,
+                id = 666,
+                
+          
+                listusers = s,
             };
             return View(indexModel);
         }
         // POST:
         //redirect to EditAction
         [HttpPost]
-        public ActionResult Index(UserInfo model)
+        public ActionResult Index(int id)
         {
             if (ModelState.IsValid)
             {
-                return RedirectToLocal(Url.Action("EditUser", "User", new { id = model.FirstName }));
+                return RedirectToLocal(Url.Action("EditUser", "User", new { id = id }));
             }
             return RedirectToLocal(Url.Action("Index", "User"));
         }
@@ -70,10 +83,10 @@ namespace HomeWork.Controllers
         {
             if (!ModelState.IsValid)
             {
-                RedirectToLocal(Url.Action("EditUser", "User", new { id = model.Id }));
+              //  RedirectToLocal(Url.Action("EditUser", "User", new { id = model.Id }));
             }
 
-            await userService.UpdateUserAsync(model);
+          //  await userService.UpdateUserAsync(model);
 
             return RedirectToLocal(redirectUrl);
         }
