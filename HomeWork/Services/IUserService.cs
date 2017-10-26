@@ -9,7 +9,7 @@ namespace HomeWork.Services
     {
         Task<UserInfo> GetUserAsync(int id);
         Task AddUserAsync(RegisterViewModel model);
-        Task<SelectList> GetUsersAsync(string dataValueField, string dataTextField);
+        Task<IEnumerable<UserInfo>> GetUsersAsync();
         Task DeleteUserAsync(int id);
         Task UpdateUserAsync(EditViewModel user);
         Task<SelectList> GetCitiesAsync(int idCountry, string dataValueField, string dataTextField);

@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using HomeWork.Models;
 using HomeWork.Repositories;
 using System.Web.Mvc;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace HomeWork.Services
 {
@@ -14,6 +16,7 @@ namespace HomeWork.Services
         {
             this.userRepository = userRepository;
         }
+
         public async Task AddUserAsync(RegisterViewModel model)
         {
 
@@ -21,7 +24,7 @@ namespace HomeWork.Services
             var cities = await userRepository.GetCitiesAsync(model.Country);
 
             string nameCountry = country.ElementAt(model.Country - 1).NameCountry;
-            string nameCity = cities.ElementAt(model.City).Name;
+            string nameCity = cities.FirstOrDefault(v => v.ID == model.City).Name;
 
             var newUser = new UserInfo()
             {
@@ -70,13 +73,10 @@ namespace HomeWork.Services
             return await userRepository.GetUserAsync(id);
         }
 
-        public async Task<SelectList> GetUsersAsync(string dataVaueString,string dataTextField)
+        public async Task<IEnumerable<UserInfo>> GetUsersAsync()
         {
-            var users = await userRepository.GetUsersAsync();
 
-            var selectListUsers = new SelectList(users, dataVaueString, dataTextField);
-
-            return selectListUsers;
+            return await userRepository.GetUsersAsync();
         }
 
         public async Task UpdateUserAsync(EditViewModel model)

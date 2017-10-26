@@ -4,48 +4,47 @@
 @{
     ViewBag.Title = "Index";
 }
-<script src="~/Scripts/jquery-1.10.2.js"></script>
-<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
-<script src="~/Scripts/jquery.validate.min.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
-<h2>List Users</h2>
-<style>
-    .list-group-item:hover, a.list-group-item:focus {
-        text-decoration: none;
-        background-color: rgb(149, 212, 255);
-    }
+<div class="container body-content" id="MainContainer">
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <h2>List Users</h2>
+    <style>
+        .list-group-item:hover, a.list-group-item:focus {
+            text-decoration: none;
+            background-color: rgb(149, 212, 255);
+        }
 
-    .glyphicon-info-sign {
-        color: rgb(255, 106, 0);
-    }
+        .glyphicon-info-sign {
+            color: rgb(255, 106, 0);
+        }
 
-    .list-group-item:active {
-        background-color: rgb(149, 212, 255);
-    }
+        .list-group-item:active {
+            background-color: rgb(149, 212, 255);
+        }
 
-    .glyphicon-user {
-        color: rgb(229, 154, 101);
-    }
+        .glyphicon-user {
+            color: rgb(229, 154, 101);
+        }
 
-    .panel-footer .pagination {
-        margin: 0;
-    }
+        .panel-footer .pagination {
+            margin: 0;
+        }
 
-    .panel-body .radio, .checkbox {
-        display: inline-block;
-        margin: 0px;
-    }
+        .panel-body .radio, .checkbox {
+            display: inline-block;
+            margin: 0px;
+        }
 
-    .list-group {
-        margin-bottom: 0px;
-    }
-</style>
+        .list-group {
+            margin-bottom: 0px;
+        }
+    </style>
 
-@using (Html.BeginForm("Index", "User", FormMethod.Post))
-{
-
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <div class="User-container">
+    @using (Html.BeginForm("Index", "User", FormMethod.Post))
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="row">
             <div class="container">
                 <div class="row">
@@ -80,10 +79,11 @@
                                         </h6>
                                     </div>
                                     <div class="col-md-6">
+                                        <!--TODO-->
                                         <ul class="pagination pagination-sm pull-right">
                                             <li class="disabled"><a href="javascript:void(0)">«</a></li>
                                             <li class="active"><a href="javascript:void(0)">1 <span class="sr-only">(current)</span></a></li>
-                                            <li><a href="javascript:void(0)">»</a></li>
+                                            <li><a href="javascript:void(0)">»</a></li> 
                                         </ul>
                                     </div>
                                 </div>
@@ -97,30 +97,35 @@
             </div>
         </div>
 
-    </div>
-    <div class="form-horizontal" style="margin-top: 50px">
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-10">
-                <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser", "User")'" value="Add" />
-            </div>
-        </div>
-        <div class="form-group">
 
-            <input type="submit" class="btn btn-default" value="1" id="id" name="id" />
+            <div class="form-horizontal" style="margin-top: 50px">
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-10">
+                        <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser", "User")'" value="Add" />
+                    </div>
+                </div>
 
-            <div class="col-md-10 col-md-offset-10">
-                <input type="submit" class="btn btn-default" value="Edit" />
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-10">
+                        <input type="submit" class="btn btn-default" value="Edit" id="EditUser" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-10">
+                        <input type="submit" class="btn btn-default" id="DelUser" value="Delete" />
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-10">
-                <input type="button" class="btn btn-default" id="DelUser" value="Delete" />
-            </div>
-        </div>
-    </div>
-}
+
+    }
+
+</div>
 <script src="~/Scripts/list.users.js"></script>
 <script>
-        urlRefreshList = '@Url.Action("DeleteUser", "User")';
-        urlDetails = '@Url.Action("DetailsUser", "User")';
+    urlRefreshList = '@Url.Action("DeleteUser", "User")';
+    urlDetails = '@Url.Action("DetailsUser", "User")';
+    urlPostIndex = '@Url.Action("EditUser", "User")';
+</script>
+<script>
+
 </script>
