@@ -2,56 +2,54 @@
 using HomeWork.Models;
 using System.Threading.Tasks;
 using HomeWork.Services;
-using System.Collections.Generic;
 
 namespace HomeWork.Controllers
 {
     public class UserController : Controller
     {
-        private const int MaxShowUser = 4;
+        private const int CountShowUser = 4;
+
         //unity inject
         private readonly IUserService userService;
-        public UserController(IUserService userService)
+        private readonly IViewFactory ModelViewBuilder;
+
+        public UserController(IUserService userService, IViewFactory viewFactory)
         {
             this.userService = userService;
+            this.ModelViewBuilder = viewFactory;
         }
         //
         // GET: /User/index
         #region listUsers
         public async Task<ActionResult> Index()
         {
-            var _users = await userService.GetUsersAsync();
-            
-            var indexModel = new IndexViewModel()
-            {
-                MaxShowUser = MaxShowUser,
-                listusers = _users as List<UserInfo>,
-            };
-            return View(indexModel);
+            //start viewModel
+            var _indexModel = await ModelViewBuilder.CreateView<int, int, int, IndexViewModel>(0, 1, CountShowUser);
+
+            return View(_indexModel);
         }
         #endregion
         //GET: /User/EditUser
         #region Edit User
         [HttpGet]
-        public async Task<ActionResult> EditUser(int id)
+        public async Task<ActionResult> EditUser(int? id)
         {
-            var user = await userService.GetUserAsync(id);
-            var listCountries = await userService.GetCountriesAsync();
-
-            EditViewModel model = new EditViewModel()
+            if (!id.HasValue)
             {
-                listCountries = listCountries,
-                RedirectUrl = Url.Action("Index", "User"),
-                FirstName = user.FirstName,
-                MiddleName = user.MiddleName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Password = user.Password,
-                Age = user.Age,
-                Detalis = user.Details,
-                PhoneNumber = user.PhoneNumber
+                return HttpNotFound();
+            }
 
-            };
+            var user = await userService.GetUserAsync(id.Value);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            //Create EditModel
+            var model = await ModelViewBuilder.CreateView<int, EditViewModel>(id.Value);
+
+            model.RedirectUrl = Url.Action("Index", "User");
+
             return PartialView(model);
         }
         //POST: /User/EditUser
@@ -60,10 +58,10 @@ namespace HomeWork.Controllers
         {
             if (!ModelState.IsValid)
             {
-              RedirectToLocal(Url.Action("EditUser", "User", new { id = model.Id }));
+                RedirectToLocal(Url.Action("EditUser", "User", new { id = model.Id }));
             }
 
-             await userService.UpdateUserAsync(model);
+            await userService.UpdateUserAsync(model);
 
             return RedirectToLocal(redirectUrl);
         }
@@ -98,6 +96,67 @@ namespace HomeWork.Controllers
         }
         #endregion
 
+        //GET:
+        public async Task<JsonResult> GetCities(int? id)
+        {
+            if (!id.HasValue)
+            {
+                return Json(null);
+            }
+            //get lits cities
+            var selectListCities = await userService.GetCitiesAsync(id.Value, "ID", "Name");
+
+            return Json(selectListCities, JsonRequestBehavior.AllowGet);
+        }
+
+        //GET /User/Index
+        [HttpGet]
+        #region Delete User
+        public async Task<ActionResult> DeleteUser(int? id, int? indexPage, int? counter)
+        {
+            if (!id.HasValue && !indexPage.HasValue && !counter.HasValue && counter.Value > 0 && indexPage.Value > 0)
+            {
+                return HttpNotFound();
+            }
+            //isfind
+            var user = await userService.GetUserAsync(id.Value);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            //delete
+            await userService.DeleteUserAsync(id.Value);
+
+            //get new list 
+            var _indexModel = await ModelViewBuilder.
+                CreateView<int, int, int, IndexViewModel>(indexPage.Value, counter.Value, CountShowUser);
+
+            return PartialView("ListUsers", _indexModel);
+        }
+
+        #endregion
+        //GET:
+        public async Task<ActionResult> DetailsUser(int id)
+        {
+            var userInfo = await userService.GetUserAsync(id);
+
+            return PartialView(userInfo);
+        }
+        //next page
+        public async Task<ActionResult> RefreshList(int? indexPage, int? counter)
+        {
+            if (!indexPage.HasValue && !counter.HasValue && counter.Value > 0 && indexPage.Value > 0)
+            {
+                return HttpNotFound();
+            }
+
+            var indexModel_ = await ModelViewBuilder.
+                CreateView<int, int, int, IndexViewModel>(indexPage.Value, counter.Value, CountShowUser);
+        
+            return PartialView("ListUsers", indexModel_);
+        }
+
         private ActionResult RedirectToLocal(string url)
         {
             if (Url.IsLocalUrl(url))
@@ -107,41 +166,6 @@ namespace HomeWork.Controllers
             return RedirectToAction("Index", "User");
         }
 
-        //GET:
-        public async Task<JsonResult> GetCities(int id)
-        {
-            var selectListCities = await userService.GetCitiesAsync(id, "ID", "Name");
-
-            return Json(selectListCities, JsonRequestBehavior.AllowGet);
-        }
-
-        //GET /User/Index
-        #region Delete User
-        public async Task<ActionResult> DeleteUser(int id)
-        {
-            if (id > 0)
-            {
-                await userService.DeleteUserAsync(id);
-            }
-            var _users = await userService.GetUsersAsync();
-
-            var indexModel = new IndexViewModel()
-            {
-                MaxShowUser = MaxShowUser,
-                listusers = _users as List<UserInfo>,
-            };
-
-            return PartialView("Index",indexModel);
-        
-        }
-        #endregion
-        //GET:
-        public async Task<ActionResult> DetailsUser(int id)
-        {
-            var userInfo = await userService.GetUserAsync(id);
-
-            return PartialView(userInfo);
-        }
-
     }
+
 }

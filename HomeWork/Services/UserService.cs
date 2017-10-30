@@ -41,8 +41,6 @@ namespace HomeWork.Services
             };
 
             await userRepository.AddUserAsync(newUser);
-
-
         }
 
         public async Task DeleteUserAsync(int id)
@@ -75,7 +73,6 @@ namespace HomeWork.Services
 
         public async Task<IEnumerable<UserInfo>> GetUsersAsync()
         {
-
             return await userRepository.GetUsersAsync();
         }
 

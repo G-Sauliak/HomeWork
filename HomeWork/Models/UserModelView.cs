@@ -6,13 +6,14 @@ namespace HomeWork.Models
 {
     public class IndexViewModel
     {
-        [Required(ErrorMessage = "Please select user")]
-        public string FirstName { get; set; }
-        public SelectList userList { get; set; }
-        public string LastName { get; set; }
         public int MaxShowUser { get; set; }
         public List<UserInfo> listusers { get; set; }
+        public int PreviousPage { get; set; }
+        public int NextPage { get; set; }
         public int id { get; set; }
+        public int TotalCountUser { get; set; }
+        public int CurrentPage { get; set; }
+        public int Counter { get; set; }
     }
 
     public class EditViewModel
@@ -155,7 +156,7 @@ namespace HomeWork.Models
 
         //Details 
         [DataType(DataType.MultilineText)]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long", MinimumLength = 20)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long", MinimumLength = 2)]
         [Display(Name = "Detalis")]
         public string Detalis { get; set; }
 

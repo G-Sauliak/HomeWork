@@ -29,7 +29,7 @@ namespace HomeWork.Models
     public class Cities
     {
         public int ID { get; set; }
-        public int Country_ID { get; set; }
+        public Country Country_ID { get; set; }
         public string Name { get; set; }
     }
 }

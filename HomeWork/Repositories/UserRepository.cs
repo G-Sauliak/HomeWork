@@ -62,7 +62,7 @@ namespace HomeWork.Repositories
 
             using (var userContext = new UserContext())
             {
-                listCities = await userContext.Cities.Where(c => c.Country_ID == id).ToListAsync();
+                listCities = await userContext.Cities.Where(c => c.Country_ID.ID == id).ToListAsync();
             }
             return listCities;
         }

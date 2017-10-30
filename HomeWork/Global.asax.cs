@@ -1,8 +1,7 @@
-﻿
+﻿using HomeWork.Common;
 using System.Data.Entity;
 using System.Web.Mvc;
 using System.Web.Routing;
-using HomeWork.Common;
 
 namespace HomeWork
 {
@@ -13,7 +12,7 @@ namespace HomeWork
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             UnityConfig.Initialise();
-        //    Database.SetInitializer<UserContext>(new DropCreateDatabaseIfModelChanges<UserContext>());
+           // Database.SetInitializer<UserContext>(new DropCreateDatabaseIfModelChanges<UserContext>());
         }
     }
 }

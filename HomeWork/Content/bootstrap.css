@@ -5483,7 +5483,7 @@ a.list-group-item:focus {
 }
 
 .panel-primary {
-  border-color: #428bca;
+  border-color: #000;
 }
 
 .panel-primary > .panel-heading {
