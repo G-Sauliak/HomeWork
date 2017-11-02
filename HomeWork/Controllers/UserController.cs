@@ -1,32 +1,28 @@
 ﻿using System.Web.Mvc;
 using HomeWork.Models;
 using System.Threading.Tasks;
-using HomeWork.Services;
+using System.Collections.Generic;
+using X.PagedList;
+
 
 namespace HomeWork.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
-        private const int CountShowUser = 4;
-
-        //unity inject
-        private readonly IUserService userService;
-        private readonly IViewFactory ModelViewBuilder;
-
-        public UserController(IUserService userService, IViewFactory viewFactory)
-        {
-            this.userService = userService;
-            this.ModelViewBuilder = viewFactory;
-        }
-        //
         // GET: /User/index
         #region listUsers
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> ListUsers(int? page = 1)
         {
-            //start viewModel
-            var _indexModel = await ModelViewBuilder.CreateView<int, int, int, IndexViewModel>(0, 1, CountShowUser);
+            IEnumerable<UserInfo> users = null;
+            const int pageSize = 4;
 
-            return View(_indexModel);
+            if (!page.HasValue) return HttpNotFound();
+
+            ViewBag.CountUsers = await userService.CountUsers();
+            
+            users = await userService.GetUsersForPageList(page.Value, pageSize);
+
+            return View(users);
         }
         #endregion
         //GET: /User/EditUser
@@ -40,7 +36,6 @@ namespace HomeWork.Controllers
             }
 
             var user = await userService.GetUserAsync(id.Value);
-
             if (user == null)
             {
                 return HttpNotFound();
@@ -48,7 +43,7 @@ namespace HomeWork.Controllers
             //Create EditModel
             var model = await ModelViewBuilder.CreateView<int, EditViewModel>(id.Value);
 
-            model.RedirectUrl = Url.Action("Index", "User");
+            model.RedirectUrl = Url.Action("ListUsers", "User");
 
             return PartialView(model);
         }
@@ -61,7 +56,13 @@ namespace HomeWork.Controllers
                 RedirectToLocal(Url.Action("EditUser", "User", new { id = model.Id }));
             }
 
-            await userService.UpdateUserAsync(model);
+            var result = await userService.UpdateUserAsync(model);
+
+            if (!result)
+            {
+                ModelState.AddModelError(string.Empty, "The user cannot be Update");
+                return View(model);
+            }
 
             return RedirectToLocal(redirectUrl);
         }
@@ -70,12 +71,13 @@ namespace HomeWork.Controllers
         #region Add User
         public async Task<ActionResult> AddUser()
         {
-            var listCountries = await userService.GetCountriesAsync();
+           //var listCountries = await UserService.GetCountriesAsync();
+           var listCountries = await userService.GetCountriesAsync();
 
             var model = new RegisterViewModel()
             {
                 JsonActionUrl = Url.Action("GetCities", "User"),
-                RedirectUrl = Url.Action("Index", "User"),
+                RedirectUrl = Url.Action("ListUsers", "User"),
                 listCountry = listCountries
             };
 
@@ -87,11 +89,22 @@ namespace HomeWork.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ModelState.AddModelError(string.Empty, "The user cannot be added");
                 return View(model);
             }
 
-            await userService.AddUserAsync(model);
+            bool result = await userService.AddUserAsync(model);
 
+            if (!result)
+            {
+                ModelState.AddModelError(string.Empty, "The user cannot be added");
+                View(new RegisterViewModel()
+                {
+                    JsonActionUrl = Url.Action("GetCities", "User"),
+                    listCountry = await userService.GetCountriesAsync(),
+                    RedirectUrl = Url.Action("ListUsers", "User")
+                });
+            }
             return RedirectToLocal(redirectUrl);
         }
         #endregion
@@ -104,7 +117,7 @@ namespace HomeWork.Controllers
                 return Json(null);
             }
             //get lits cities
-            var selectListCities = await userService.GetCitiesAsync(id.Value, "ID", "Name");
+            var selectListCities = await userService.GetCitiesAsync(id.Value);
 
             return Json(selectListCities, JsonRequestBehavior.AllowGet);
         }
@@ -112,50 +125,27 @@ namespace HomeWork.Controllers
         //GET /User/Index
         [HttpGet]
         #region Delete User
-        public async Task<ActionResult> DeleteUser(int? id, int? indexPage, int? counter)
+        public async Task<ActionResult> DeleteUser(int? id)
         {
-            if (!id.HasValue && !indexPage.HasValue && !counter.HasValue && counter.Value > 0 && indexPage.Value > 0)
+            if (!id.HasValue)
             {
                 return HttpNotFound();
             }
-            //isfind
-            var user = await userService.GetUserAsync(id.Value);
-
-            if (user == null)
-            {
-                return HttpNotFound();
-            }
-            //delete
+           
             await userService.DeleteUserAsync(id.Value);
-
-            //get new list 
-            var _indexModel = await ModelViewBuilder.
-                CreateView<int, int, int, IndexViewModel>(indexPage.Value, counter.Value, CountShowUser);
-
-            return PartialView("ListUsers", _indexModel);
+  
+            return RedirectToLocal(Url.Action("ListUsers"));
         }
 
         #endregion
         //GET:
         public async Task<ActionResult> DetailsUser(int id)
         {
-            var userInfo = await userService.GetUserAsync(id);
+            var newInfo = await userService.GetUserAsync(id);
 
-            return PartialView(userInfo);
+            return PartialView(newInfo);
         }
         //next page
-        public async Task<ActionResult> RefreshList(int? indexPage, int? counter)
-        {
-            if (!indexPage.HasValue && !counter.HasValue && counter.Value > 0 && indexPage.Value > 0)
-            {
-                return HttpNotFound();
-            }
-
-            var indexModel_ = await ModelViewBuilder.
-                CreateView<int, int, int, IndexViewModel>(indexPage.Value, counter.Value, CountShowUser);
-        
-            return PartialView("ListUsers", indexModel_);
-        }
 
         private ActionResult RedirectToLocal(string url)
         {
@@ -163,7 +153,7 @@ namespace HomeWork.Controllers
             {
                 return Redirect(url);
             }
-            return RedirectToAction("Index", "User");
+            return RedirectToAction("ListUsers", "User");
         }
 
     }

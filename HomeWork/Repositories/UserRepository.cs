@@ -1,91 +1,89 @@
-﻿using System.Collections.Generic;
+﻿using HomeWork.Models;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
-using HomeWork.Models;
 using HomeWork.Common;
 using System.Data.Entity;
-using System.Linq;
-
 
 namespace HomeWork.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public UserRepository() { }
+        private readonly UserContext context;
 
-        public async Task AddUserAsync(UserInfo user)
+        public UserRepository(UserContext context)
         {
-            using (var userContext = new UserContext())
-            {
-                userContext.Entry(user).State = EntityState.Added;
-
-                await userContext.SaveChangesAsync();
-            }
+            this.context = context;
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task AddAsync(UserInfo item)
         {
-            using (var userContext = new UserContext())
-            {
-                var student = await userContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            context.Entry(item).State = EntityState.Added;
 
-                userContext.Entry(student).State = EntityState.Deleted;
-
-                await userContext.SaveChangesAsync();
-            }
+            await context.SaveChangesAsync();
         }
 
-        public async Task<UserInfo> GetUserAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            var user = new UserInfo();
+            var student = await context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            using (var userContext = new UserContext())
+            context.Entry(student).State = EntityState.Deleted;
+
+            await context.SaveChangesAsync();
+        }
+
+        public IQueryable<UserInfo> Get
+        {
+            get { return context.Users.AsNoTracking().AsQueryable(); }
+        }
+
+        public async Task UpdateAsync(UserInfo user)
+        {
+            context.Entry(user).State = EntityState.Modified;
+
+            await context.SaveChangesAsync();
+        }
+
+        public IQueryable<Cities> GetCities()
+        {
+            return context.Cities.AsQueryable();
+        }
+
+        public IQueryable<Country> GetCountries()
+        {
+            return context.Country.AsQueryable();
+        }
+
+        public async Task<UserInfo> FindUserAsync(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user != null)
             {
-                user = await userContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+                context.Entry(user).State = EntityState.Detached;
             }
             return user;
         }
 
-        public async Task<IEnumerable<UserInfo>> GetUsersAsync()
-        {
-            var listUsers = new List<UserInfo>();
+        private bool disposed = false;
 
-            using (var userContext = new UserContext())
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                listUsers = await userContext.Users.ToListAsync();
+                if (disposing)
+                {
+                    context.Dispose();
+                }
             }
-            return listUsers;
+            disposed = true;
         }
 
-        public async Task<IEnumerable<Cities>> GetCitiesAsync(int id)
+        public void Dispose()
         {
-            IEnumerable<Cities> listCities;
-
-            using (var userContext = new UserContext())
-            {
-                listCities = await userContext.Cities.Where(c => c.Country_ID.ID == id).ToListAsync();
-            }
-            return listCities;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public async Task UpdateUserAsync(UserInfo user)
-        {
-            using (var userContext = new UserContext())
-            {
-                userContext.Entry(user).State = EntityState.Modified;
-
-                await userContext.SaveChangesAsync();
-            }
-        }
-
-        public async Task<IEnumerable<Country>> GetCountriesAsync()
-        {
-            var listCountry = new List<Country>();
-
-            using (var userContext = new UserContext())
-            {
-                listCountry = await userContext.Country.ToListAsync();
-            }
-            return listCountry;
-        }
+       
     }
 }

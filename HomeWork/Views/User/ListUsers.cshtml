@@ -1,54 +1,77 @@
-﻿@model HomeWork.Models.IndexViewModel
+﻿@model IEnumerable<HomeWork.Models.UserInfo>
+@{
+    ViewBag.Title = "ListUsers";
+}
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<style>
+    .list-group-item:hover, a.list-group-item:focus {
+        text-decoration: none;
+        background-color: rgb(149, 212, 255);
+    }
 
-<div class="container ">
+    .glyphicon-info-sign {
+        color: rgb(255, 106, 0);
+    }
+
+    .list-group-item:active {
+        background-color: rgb(149, 212, 255);
+    }
+
+    .glyphicon-user {
+        color: rgb(229, 154, 101);
+    }
+
+    .panel-footer .pagination {
+        margin: 0;
+    }
+
+    .panel-body .radio, .checkbox {
+        display: inline-block;
+        margin: 0px;
+    }
+
+
+    .list-group {
+        margin-bottom: 0px;
+    }
+</style>
+
+<div class="container body-content" id="MainContainer">
+    <h2>List Users</h2>
+
     <div class="row">
-        <div class="col-md-5">
-            <div class="panel panel-primary">
-                <div class="panel-body" id="userlist">
-                    <ul class="nav list-group">
-                        @for (int i = 0; i < Model.MaxShowUser; i++)
-                        {
-                            if (i >= Model.listusers.Count())
-                            {
-                                <li class="list-group-item" style="visibility: hidden"><div class="checkbox"><span class="glyphicon glyphicon-user"></span></div></li>
-                                continue;
-                            }
-                            <li class="list-group-item"><span style="visibility: hidden" userID="@Model.listusers[i].Id"></span>
-                                <div class="checkbox"><span>@(Model.Counter++).</span>
-                                    <span class="glyphicon glyphicon-user"></span>
-                                    <label for="checkbox">@Model.listusers[i].FirstName @Model.listusers[i].LastName</label>
-                                </div>
-                                <div class="pull-right action-buttons ">
-                                    <a href="#" userID="@Model.listusers[i].Id"><span class="glyphicon glyphicon-info-sign"></span></a>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                </div>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>
-                                Total Count: <span class="label label-info" id="total-count">@(Model.TotalCountUser)</span>
-                            </h6>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="pagination pagination-sm pull-right">
-                                <li><a href="#" indexPage="@Model.PreviousPage"><span class="glyphicon glyphicon-arrow-left"></span></a></li>
-                                <li><span id="current-page">@Model.CurrentPage</span></li>
-                                <li><a href="#" indexPage="@Model.NextPage"><span class="glyphicon glyphicon-arrow-right"></span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+        <div class="container" id="UserListBox">
+           @Html.Partial("DetailsListUsers", Model)
+        </div>
+
+    </div>
+    <div class="form-horizontal" style="margin-top: 50px">
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser", "User")'" value="Add" />
             </div>
         </div>
-        <div class="col-xs-6">
-            <div id="user_content"></div>
+
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="submit" class="btn btn-default" id="EditUser" value="Edit" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10 col-md-offset-10">
+                <input type="submit" class="btn btn-default" id="DelUser" value="Delete" />
+            </div>
         </div>
     </div>
-    <span class="text-danger field-validation-error" id="select-validation"></span>
-    <span id="counter" style="display:none">@Model.Counter</span>
-    <span id="revert" style="display:none">@((Model.MaxShowUser)+Model.listusers.Count)</span>
-    <span id="delete-user" style="display:none">@Model.listusers.Count</span>
+
 </div>
+
+<script src="~/Scripts/MyScripts/list.users.js"></script>
+<script>
+    urlDeleteUser = '@Url.Action("DeleteUser", "User")';
+    urlDetails = '@Url.Action("DetailsUser", "User")';
+    urlEditGet = '@Url.Action("EditUser", "User")';
+</script>

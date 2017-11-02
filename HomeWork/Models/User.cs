@@ -8,6 +8,7 @@ namespace HomeWork.Models
 {
     public class UserInfo
     {
+        [Key]
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
@@ -23,11 +24,13 @@ namespace HomeWork.Models
 
     public class Country
     {
+        [Key]
         public int ID { get; set; }
         public string NameCountry { get; set; }
     }
     public class Cities
     {
+        [Key]
         public int ID { get; set; }
         public Country Country_ID { get; set; }
         public string Name { get; set; }
