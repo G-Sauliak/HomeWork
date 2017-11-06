@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Data.Entity;
 using X.PagedList;
-
+using System;
 
 namespace HomeWork.Services
 {
@@ -22,8 +22,8 @@ namespace HomeWork.Services
         #region Add
         public async Task<bool> AddUserAsync(RegisterViewModel model)
         {
-            string nameCountry;
-            string nameCity;
+            string nameCountry = string.Empty;
+            string nameCity = string.Empty;
 
             if (!IsValidCountry(model.City, model.Country, out nameCity, out nameCountry)) return false;
 
@@ -57,11 +57,19 @@ namespace HomeWork.Services
             return true;
         }
         //Get Cities
-        public async Task<SelectList> GetCitiesAsync(int idCountry)
+        public async Task<SelectList> GetCitiesAsync(int idCountry, string selected)
         {
-            var listCities = await userRepository.GetCities().
+            var listCities = await userRepository.GetCities().OrderBy(c => c.Name).
                 Where(i => i.Country_ID.ID == idCountry).
                 ToListAsync();
+
+            if (!string.IsNullOrEmpty(selected))
+            {
+                var temp = listCities.First();
+                var indexSelect = listCities.FindIndex(c => c.Name == selected);
+                listCities[0] = listCities.FirstOrDefault(c => c.Name == selected);
+                listCities[indexSelect] = temp;
+            }
 
             var selectList = new SelectList(listCities, "ID", "Name");
 
@@ -69,14 +77,24 @@ namespace HomeWork.Services
 
         }
         //Get Countries
-        public async Task<SelectList> GetCountriesAsync()
+        public async Task<SelectList> GetCountriesAsync(string selected)
         {
-            var listCountries = await userRepository.GetCountries().ToListAsync();
+            var listCountries = await userRepository.GetCountries().OrderBy(c => c.NameCountry).ToListAsync();
+
+            if (!string.IsNullOrEmpty(selected))
+            {
+                var temp = listCountries.First();
+                var indexSelect = listCountries.FindIndex(c => c.NameCountry == selected);
+                listCountries[0] = listCountries.FirstOrDefault(c => c.NameCountry == selected);
+                listCountries[indexSelect] = temp;
+            }
 
             var selectList = new SelectList(listCountries, "ID", "NameCountry");
 
             return selectList;
         }
+
+
 
         public async Task<UserInfo> GetUserAsync(int id)
         {
@@ -85,17 +103,38 @@ namespace HomeWork.Services
             return user;
         }
 
-        public async Task<IEnumerable<UserInfo>> GetUsersForPageList(int page, int pageSize)
+        public async Task<IEnumerable<UserInfo>> GetUsersForPageList(int page, int pageSize, string sort, string search)
         {
-            return await userRepository.Get.OrderBy(p => p.Id).ToPagedListAsync(page, pageSize);
+            IEnumerable<UserInfo> users = null;
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                users = await userRepository.Get.OrderBy(p => p.Id).Where(s => s.FirstName.Contains(search)
+                                        || s.LastName.Contains(search)).ToPagedListAsync(page, pageSize);
+            }
+            else
+            {
+                switch (sort)
+                {
+                    case "name_desc":
+                        users = await userRepository.Get.OrderByDescending(p => p.FirstName).ToPagedListAsync(page, pageSize);
+                        break;
+                    default:  //ascending
+                        users = await userRepository.Get.OrderBy(p => p.FirstName).ToPagedListAsync(page, pageSize);
+                        break;
+                        //...
+                }
+            }
+
+            return users;
         }
         //UPDATE
         #region Update
         public async Task<bool> UpdateUserAsync(EditViewModel model)
         {
 
-            string nameCountry;
-            string nameCity;
+            string nameCountry = string.Empty;
+            string nameCity = string.Empty;
 
             if (!IsValidCountry(model.City, model.Country, out nameCity, out nameCountry)) return false;
 
@@ -124,12 +163,12 @@ namespace HomeWork.Services
         }
         #endregion
 
-        public async Task<int> CountUsers()
+        public async Task<int> CountUsersAsync()
         {
             return await userRepository.Get.CountAsync();
         }
 
-        private bool IsValidCountry(int idCity, int idCountry,out string nameCity, out string nameCountry)
+        private bool IsValidCountry(int idCity, int idCountry, out string nameCity, out string nameCountry)
         {
             nameCity = string.Empty;
             nameCountry = string.Empty;
@@ -142,20 +181,20 @@ namespace HomeWork.Services
 
             if (result)
             {
-                   nameCountry = userRepository.GetCountries().
-                   Where(c => c.ID == idCountry).
-                   Select(c => c.NameCountry).
-                   Single();
+                nameCountry = userRepository.GetCountries().
+                Where(c => c.ID == idCountry).
+                Select(c => c.NameCountry).
+                Single();
 
-                    nameCity = userRepository.
-                    GetCities().
-                    Where(c => c.ID == idCity).
-                    Select(c => c.Name).
-                    Single();
+                nameCity = userRepository.
+                GetCities().
+                Where(c => c.ID == idCity).
+                Select(c => c.Name).
+                Single();
 
                 return true;
             }
-            return false; 
+            return false;
         }
 
     }

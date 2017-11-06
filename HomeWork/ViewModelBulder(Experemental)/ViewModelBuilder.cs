@@ -16,7 +16,7 @@ namespace HomeWork.ViewModelBulder
         async Task<EditViewModel> IViewBuilder<int, EditViewModel>.Build(int id)
         {
 
-            var listCountries = await userService.GetCountriesAsync();
+            var listCountries = await userService.GetCountriesAsync(string.Empty);
 
             var user = await userService.GetUserAsync(id);
             if (user == null) return null;

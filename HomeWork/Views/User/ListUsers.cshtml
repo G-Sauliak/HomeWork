@@ -41,13 +41,26 @@
 
 <div class="container body-content" id="MainContainer">
     <h2>List Users</h2>
+    @using (Html.BeginForm("ListUsers", "User", FormMethod.Get))
+    {
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.Label("Find by name:", new { @class = "control-label" })
+                    @Html.TextBox("search", ViewBag.CurrentFilter as string, new { @class = "form-control" })
+                    <input class="btn btn-group " type="submit" value="Search" style="margin-top:10px" />
+                </div>
+            </div>
 
-    <div class="row">
-        <div class="container" id="UserListBox">
-           @Html.Partial("DetailsListUsers", Model)
+            <div class="form-group">
+                <div class="col-md-10">
+                    <div class="row" id="UserListBox">
+                        @Html.Partial("DetailsListUsers", Model)
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
+    }
     <div class="form-horizontal" style="margin-top: 50px">
         <div class="form-group">
             <div class="col-md-10 col-md-offset-10">
@@ -57,12 +70,12 @@
 
         <div class="form-group">
             <div class="col-md-10 col-md-offset-10">
-                <input type="submit" class="btn btn-default" id="EditUser" value="Edit" />
+                <input type="submit" class="btn btn-default" onclick="EditUser()" value="Edit" />
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-10 col-md-offset-10">
-                <input type="submit" class="btn btn-default" id="DelUser" value="Delete" />
+                <input type="submit" class="btn btn-default" onclick="DeleteUser()" value="Delete" />
             </div>
         </div>
     </div>

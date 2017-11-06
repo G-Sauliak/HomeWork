@@ -1,9 +1,6 @@
 ﻿using System.Web.Mvc;
 using HomeWork.Models;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using X.PagedList;
-
 
 namespace HomeWork.Controllers
 {
@@ -11,16 +8,26 @@ namespace HomeWork.Controllers
     {
         // GET: /User/index
         #region listUsers
-        public async Task<ActionResult> ListUsers(int? page = 1)
+        public async Task<ActionResult> ListUsers(int? page, string sort, string currentFilter, string search)
         {
-            IEnumerable<UserInfo> users = null;
             const int pageSize = 4;
 
-            if (!page.HasValue) return HttpNotFound();
+            ViewBag.CurrentSort = sort;
+            ViewBag.NameSortParam = string.IsNullOrEmpty(sort) ? "name_desc" : "";
+            ViewBag.CountUsers = await userService.CountUsersAsync();
 
-            ViewBag.CountUsers = await userService.CountUsers();
-            
-            users = await userService.GetUsersForPageList(page.Value, pageSize);
+            if (search != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                search = currentFilter;
+            }
+
+            int pageNum = (page ?? 1);
+
+            var users = await userService.GetUsersForPageList(pageNum, pageSize, sort, search);
 
             return View(users);
         }
@@ -36,14 +43,38 @@ namespace HomeWork.Controllers
             }
 
             var user = await userService.GetUserAsync(id.Value);
+
             if (user == null)
             {
                 return HttpNotFound();
             }
-            //Create EditModel
-            var model = await ModelViewBuilder.CreateView<int, EditViewModel>(id.Value);
+        
+            var listCountries = await userService.GetCountriesAsync(user.Country);
+            
+            int IdCountry = default(int);
 
-            model.RedirectUrl = Url.Action("ListUsers", "User");
+            foreach (var item in listCountries)
+            {
+                if (item.Text.Equals(user.Country))
+                {
+                    IdCountry = int.Parse(item.Value);
+                }
+            }
+            var listCities = await userService.GetCitiesAsync(IdCountry,user.City);
+
+            EditViewModel model = new EditViewModel()
+            {
+                listCountries = listCountries,
+                listCities = listCities,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Password = user.Password,
+                Age = user.Age,
+                Detalis = user.Details,
+                PhoneNumber = user.PhoneNumber
+            };
 
             return PartialView(model);
         }
@@ -72,7 +103,7 @@ namespace HomeWork.Controllers
         public async Task<ActionResult> AddUser()
         {
            //var listCountries = await UserService.GetCountriesAsync();
-           var listCountries = await userService.GetCountriesAsync();
+           var listCountries = await userService.GetCountriesAsync(string.Empty);
 
             var model = new RegisterViewModel()
             {
@@ -101,7 +132,7 @@ namespace HomeWork.Controllers
                 View(new RegisterViewModel()
                 {
                     JsonActionUrl = Url.Action("GetCities", "User"),
-                    listCountry = await userService.GetCountriesAsync(),
+                    listCountry = await userService.GetCountriesAsync(string.Empty),
                     RedirectUrl = Url.Action("ListUsers", "User")
                 });
             }
@@ -117,7 +148,7 @@ namespace HomeWork.Controllers
                 return Json(null);
             }
             //get lits cities
-            var selectListCities = await userService.GetCitiesAsync(id.Value);
+            var selectListCities = await userService.GetCitiesAsync(id.Value,string.Empty);
 
             return Json(selectListCities, JsonRequestBehavior.AllowGet);
         }

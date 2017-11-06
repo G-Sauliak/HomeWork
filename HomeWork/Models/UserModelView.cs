@@ -1,26 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using System.Collections.Generic;
 
 namespace HomeWork.Models
 {
-    public class IndexViewModel
-    {
-        public int MaxShowUser { get; set; }
-        public List<UserInfo> listusers { get; set; }
-        public int PreviousPage { get; set; }
-        public int NextPage { get; set; }
-        public int id { get; set; }
-        public int TotalCountUser { get; set; }
-        public int CurrentPage { get; set; }
-        public int Counter { get; set; }
-    }
-
     public class EditViewModel
     {
         /// public string JsonActionUrl { get; set; }
         public string RedirectUrl { get; set; }
         public SelectList listCountries { get; set; }
+        public SelectList listCities { get; set; }
 
         [Key]
         public int Id { get; set; }
@@ -70,11 +58,9 @@ namespace HomeWork.Models
         public string PhoneNumber { get; set; }
 
         //Country 
-        [Required]
         [Display(Name = "Country")]
         public int Country { get; set; }
         //City 
-        [Required]
         [Display(Name = "Citys")]
         public int City { get; set; }
 

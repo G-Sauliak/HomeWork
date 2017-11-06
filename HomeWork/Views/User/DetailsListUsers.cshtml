@@ -4,19 +4,20 @@
 
 <div class="container body-content ">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-6">
             <div class="panel panel-primary">
                 <div class="panel-body" id="userlist">
+                    @Html.ActionLink("Name", "ListUsers", new { sort = ViewBag.NameSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "glyphicon glyphicon-sort-by-alphabet" })
                     <ul class="nav list-group">
                         @foreach (var item in Model)
                         {
-                            <li class="list-group-item">
+                            <li class="list-group-item" value="@item.Id">
                                 <div class="checkbox">
                                     <span class="glyphicon glyphicon-user"></span>
                                     <label for="checkbox">@item.FirstName @item.LastName</label>
                                 </div>
                                 <div class="pull-right action-buttons ">
-                                    <a href="#" id ="Details" userID="@item.Id"><span class="glyphicon glyphicon-info-sign"></span></a>
+                                    <a href="#" userID="@item.Id"><span class="glyphicon glyphicon-info-sign"></span></a>
                                 </div>
                             </li>
                         }
@@ -32,7 +33,7 @@
                         <div class="col-md-6">
                             <div class="pagination pagination-sm pull-right">
 
-                                @Html.PagedListPager(Model as IPagedList, page => Url.Action("ListUsers", new { page }), PagedListRenderOptions.MinimalWithPageCountText)
+                                @Html.PagedListPager(Model as IPagedList, page => Url.Action("ListUsers", new { page, sort = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }), PagedListRenderOptions.MinimalWithPageCountText)
                             </div>
                         </div>
                     </div>
