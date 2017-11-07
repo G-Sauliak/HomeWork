@@ -3,8 +3,8 @@ var Cities = $('#Cities');
 var Countries = $('#countries');
 
 var selectedValue = false;
-$("#countries option:selected").each(function () {
-    if ($(this).text() === "Select Country") {
+$("#Cities option:selected").each(function () {
+    if ($(this).text() === "Select City") {
         Cities.prop("disabled", true);
         selectedValue = true;
     }
@@ -27,4 +27,3 @@ Countries.change(function () {
         });
     });
 });
-

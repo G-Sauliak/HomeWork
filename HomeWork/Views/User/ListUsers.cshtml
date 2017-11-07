@@ -79,12 +79,12 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <script src="~/Scripts/MyScripts/list.users.js"></script>
 <script>
-    urlDeleteUser = '@Url.Action("DeleteUser", "User")';
-    urlDetails = '@Url.Action("DetailsUser", "User")';
-    urlEditGet = '@Url.Action("EditUser", "User")';
+   var urlDeleteUser = '@Url.Action("DeleteUser", "User")';
+   var urlDetails = '@Url.Action("DetailsUser", "User")';
+   var urlEditUser = '@Url.Action("EditUser", "User", new { id = "userID" })';
 </script>
+

@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Data.Entity;
 using X.PagedList;
-using System;
+using System.Data.Entity.Core.Objects;
 
 namespace HomeWork.Services
 {
@@ -25,8 +25,8 @@ namespace HomeWork.Services
             string nameCountry = string.Empty;
             string nameCity = string.Empty;
 
-            if (!IsValidCountry(model.City, model.Country, out nameCity, out nameCountry)) return false;
-
+            if (!IsRelationship(model.City, model.Country, out nameCity, out nameCountry)) return false;
+        
             var newUser = new UserInfo()
             {
                 FirstName = model.FirstName,
@@ -135,8 +135,8 @@ namespace HomeWork.Services
 
             string nameCountry = string.Empty;
             string nameCity = string.Empty;
-
-            if (!IsValidCountry(model.City, model.Country, out nameCity, out nameCountry)) return false;
+          
+            if (!IsRelationship(model.City, model.Country, out nameCity, out nameCountry)) return false;
 
             var user = await userRepository.FindUserAsync(model.Id);
 
@@ -168,14 +168,14 @@ namespace HomeWork.Services
             return await userRepository.Get.CountAsync();
         }
 
-        private bool IsValidCountry(int idCity, int idCountry, out string nameCity, out string nameCountry)
+        private bool IsRelationship(int idCity, int idCountry, out string nameCity, out string nameCountry)
         {
             nameCity = string.Empty;
             nameCountry = string.Empty;
 
-            var country = userRepository.GetCountries().Where(c => c.ID == idCountry);
+            var country = userRepository.GetCountries().Where(c => c.ID == idCountry).Any();
 
-            if (country == null) return false;
+            if (!country) return false;
 
             bool result = userRepository.GetCities().Where(n => n.ID == idCity).Any(id => id.Country_ID.ID == idCountry);
 
@@ -183,14 +183,11 @@ namespace HomeWork.Services
             {
                 nameCountry = userRepository.GetCountries().
                 Where(c => c.ID == idCountry).
-                Select(c => c.NameCountry).
-                Single();
+                Single().NameCountry;
 
-                nameCity = userRepository.
-                GetCities().
+                nameCity = userRepository.GetCities().
                 Where(c => c.ID == idCity).
-                Select(c => c.Name).
-                Single();
+                Single().Name;
 
                 return true;
             }

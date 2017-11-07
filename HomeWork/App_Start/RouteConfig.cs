@@ -14,10 +14,11 @@ namespace HomeWork
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "Default",
+                name: "ListUsers",
                 url: "{controller}/{action}/{page}",
                 defaults: new { controller = "User", action = "ListUsers", page = UrlParameter.Optional }
             );
+
         }
     }
 }

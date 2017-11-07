@@ -1,7 +1,4 @@
-﻿var urlDeleteUser = "";
-var urlDetails = "";
-var userID = "";
-var urlEditPost = "";
+﻿var userID = "";
 
 $('#UserListBox').on('click', 'a[href = "#"]', function () {
     var val = $(this).attr('UserID');
@@ -9,29 +6,17 @@ $('#UserListBox').on('click', 'a[href = "#"]', function () {
 });
 
 $('#UserListBox').on('click', '.list-group-item', function () {
-    //  $("#select-validation").empty();
     userID = $(this).val();
     $('.nav li').removeClass('active');
     $(this).addClass('active');
 });
-
-function EditUser()
-{
-    if (!userID == "") {
-        $.get(urlEditGet, { id: userID }, function (result) {
-            $("#MainContainer").html(result);
-        });
-    }
-    else {
-        $("#select-validation").text("Please select user!");
-    };
-};
+function EditUser() {
+    window.location.href = urlEditUser.replace('userID', userID);
+}
 function DeleteUser() {
     $.get(urlDeleteUser, { id: userID }, function () {
         location.reload();
     });
-
-    e.preventDefault();
 }
 
 

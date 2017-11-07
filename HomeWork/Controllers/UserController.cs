@@ -8,6 +8,7 @@ namespace HomeWork.Controllers
     {
         // GET: /User/index
         #region listUsers
+        [Route("ListUsers/{page}")]
         public async Task<ActionResult> ListUsers(int? page, string sort, string currentFilter, string search)
         {
             const int pageSize = 4;
@@ -76,7 +77,7 @@ namespace HomeWork.Controllers
                 PhoneNumber = user.PhoneNumber
             };
 
-            return PartialView(model);
+            return View(model);
         }
         //POST: /User/EditUser
         [HttpPost]
@@ -91,7 +92,10 @@ namespace HomeWork.Controllers
 
             if (!result)
             {
+               
                 ModelState.AddModelError(string.Empty, "The user cannot be Update");
+                model.listCountries = await userService.GetCountriesAsync(string.Empty);
+                model.listCities = await userService.GetCitiesAsync(1,string.Empty);
                 return View(model);
             }
 
