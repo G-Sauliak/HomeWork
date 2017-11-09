@@ -66,7 +66,7 @@ namespace HomeWork.Services
             {
 
                 int indexSelect = listCities.FindIndex(c => c.Name == selected);
-                FocusDropdown(listCities, indexSelect);
+                FocusDropDown(listCities, indexSelect);
             }
 
             var selectList = new SelectList(listCities, "ID", "Name");
@@ -74,14 +74,21 @@ namespace HomeWork.Services
             return selectList;
 
         }
-
-        private List<T> FocusDropdown<T>(List<T> list, int index)
+        /// <summary>
+        /// set the selected item on the first place
+        /// </summary>
+        /// <typeparam name="T">TypeList</typeparam>
+        /// <param name="list">listForDopDown</param>
+        /// <param name="index">selectedIndex</param>
+        /// <returns>list</returns>
+        private List<T> FocusDropDown<T>(List<T> list, int index)
         {
             var temp = list.First();
             list[0] = list[index];
             list[index] = temp;
             return list;
         }
+
 
         //Get Countries
         public async Task<SelectList> GetCountriesAsync(string selected)
@@ -92,7 +99,7 @@ namespace HomeWork.Services
             {
                 int selectIndex = listCountries.FindIndex(c => c.NameCountry == selected);
 
-                FocusDropdown(listCountries, selectIndex);
+                FocusDropDown(listCountries, selectIndex);
             }
 
             var selectList = new SelectList(listCountries, "ID", "NameCountry");
@@ -109,6 +116,14 @@ namespace HomeWork.Services
             return user;
         }
 
+        /// <summary>
+        /// returning users for pageList
+        /// </summary>
+        /// <param name="page">currentPage</param>
+        /// <param name="pageSize">returning users quantity</param>
+        /// <param name="sort">sortOrder for pagelist</param>
+        /// <param name="search">Find</param>
+        /// <returns></returns>
         public async Task<IEnumerable<UserInfo>> GetUsersForPageList(int page, int pageSize, string sort, string search)
         {
             IEnumerable<UserInfo> users = null;

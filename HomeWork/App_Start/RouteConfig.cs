@@ -15,7 +15,7 @@ namespace HomeWork
 
             routes.MapRoute(
                 name: "ListUsers",
-                url: "{controller}/{action}/{page}",
+                url: "{action}/{page}",
                 defaults: new { controller = "User", action = "ListUsers", page = UrlParameter.Optional }
             );
 

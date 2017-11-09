@@ -7,39 +7,15 @@
 <script src="~/Scripts/jquery.validate.min.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 <style>
-    .list-group-item:hover, a.list-group-item:focus {
-        text-decoration: none;
-        background-color: rgb(149, 212, 255);
-    }
-
     .glyphicon-info-sign {
         color: rgb(255, 106, 0);
-    }
-
-    .list-group-item:active {
-        background-color: rgb(149, 212, 255);
     }
 
     .glyphicon-user {
         color: rgb(229, 154, 101);
     }
-
-    .panel-footer .pagination {
-        margin: 0;
-    }
-
-    .panel-body .radio, .checkbox {
-        display: inline-block;
-        margin: 0px;
-    }
-
-
-    .list-group {
-        margin-bottom: 0px;
-    }
 </style>
-
-<div class="container body-content" id="MainContainer">
+<div class="container body-content">
     <h2>List Users</h2>
     @using (Html.BeginForm("ListUsers", "User", FormMethod.Get))
     {
@@ -48,37 +24,46 @@
                 <div class="col-md-10">
                     @Html.Label("Find by name:", new { @class = "control-label" })
                     @Html.TextBox("search", ViewBag.CurrentFilter as string, new { @class = "form-control" })
-                    <input class="btn btn-group " type="submit" value="Search" style="margin-top:10px" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input class="btn btn-group " type="submit" value="Search" />
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-md-10">
                     <div class="row" id="UserListBox">
-                        @Html.Partial("DetailsListUsers", Model)
+                        @Html.Partial("UserPanel", Model)
                     </div>
                 </div>
             </div>
         </div>
     }
-    <div class="form-horizontal" style="margin-top: 50px">
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-10">
-                <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser", "User")'" value="Add" />
-            </div>
-        </div>
 
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-10">
-                <input type="submit" class="btn btn-default" onclick="EditUser()" value="Edit" />
+    <div class="form-group">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-10">
+                    <input type="button" class="btn btn-default" onclick="window.location='@Url.Action("AddUser", "User")'" value="Add" />
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-10">
-                <input type="submit" class="btn btn-default" onclick="DeleteUser()" value="Delete" />
+
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-10">
+                    <input type="submit" class="btn btn-default" onclick="EditUser()" value="Edit" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-10">
+                    <input type="submit" class="btn btn-default" onclick="DeleteUser()" value="Delete" />
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <script src="~/Scripts/MyScripts/list.users.js"></script>
