@@ -1,26 +1,26 @@
 ﻿var urlGetCities = "";
-var Cities = $('#Cities');
-var Countries = $('#countries');
+var CitiesDropDown = $('#Cities');
+var CountriesDropDown = $('#countries');
 
 var selectedValue = false;
 $("#Cities option:selected").each(function () {
     if ($(this).text() === "Select City") {
-        Cities.prop("disabled", true);
+        CitiesDropDown.prop("disabled", true);
         selectedValue = true;
     }
 });
-Countries.change(function () {
-    Cities.prop("disabled", false);
+CountriesDropDown.change(function () {
+    CitiesDropDown.prop("disabled", false);
     if (selectedValue) {
-        Countries.children()[0].remove();
+        CountriesDropDown.children()[0].remove();
         selectedValue = false;
     }
     $("#countries option:selected").each(function () {
         var _id = $(this).val();
         $.getJSON(urlGetCities, { id: _id }, function (result) {
-            Cities.empty();
+            CitiesDropDown.empty();
             $.each(result, function (i) {
-                Cities.append($("<option></option>")
+                CitiesDropDown.append($("<option></option>")
                     .attr("value", result[i].Value)
                     .text(result[i].Text));
             });

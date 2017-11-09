@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Data.Entity;
 using X.PagedList;
-using System.Data.Entity.Core.Objects;
 
 namespace HomeWork.Services
 {
@@ -25,8 +24,8 @@ namespace HomeWork.Services
             string nameCountry = string.Empty;
             string nameCity = string.Empty;
 
-            if (!IsRelationship(model.City, model.Country, out nameCity, out nameCountry)) return false;
-        
+            if (!IsAssertCityToCountry(model.City, model.Country, out nameCity, out nameCountry)) return false;
+
             var newUser = new UserInfo()
             {
                 FirstName = model.FirstName,
@@ -65,10 +64,9 @@ namespace HomeWork.Services
 
             if (!string.IsNullOrEmpty(selected))
             {
-                var temp = listCities.First();
-                var indexSelect = listCities.FindIndex(c => c.Name == selected);
-                listCities[0] = listCities.FirstOrDefault(c => c.Name == selected);
-                listCities[indexSelect] = temp;
+
+                int indexSelect = listCities.FindIndex(c => c.Name == selected);
+                FocusDropdown(listCities, indexSelect);
             }
 
             var selectList = new SelectList(listCities, "ID", "Name");
@@ -76,6 +74,15 @@ namespace HomeWork.Services
             return selectList;
 
         }
+
+        private List<T> FocusDropdown<T>(List<T> list, int index)
+        {
+            var temp = list.First();
+            list[0] = list[index];
+            list[index] = temp;
+            return list;
+        }
+
         //Get Countries
         public async Task<SelectList> GetCountriesAsync(string selected)
         {
@@ -83,10 +90,9 @@ namespace HomeWork.Services
 
             if (!string.IsNullOrEmpty(selected))
             {
-                var temp = listCountries.First();
-                var indexSelect = listCountries.FindIndex(c => c.NameCountry == selected);
-                listCountries[0] = listCountries.FirstOrDefault(c => c.NameCountry == selected);
-                listCountries[indexSelect] = temp;
+                int selectIndex = listCountries.FindIndex(c => c.NameCountry == selected);
+
+                FocusDropdown(listCountries, selectIndex);
             }
 
             var selectList = new SelectList(listCountries, "ID", "NameCountry");
@@ -135,12 +141,18 @@ namespace HomeWork.Services
 
             string nameCountry = string.Empty;
             string nameCity = string.Empty;
-          
-            if (!IsRelationship(model.City, model.Country, out nameCity, out nameCountry)) return false;
+
+            if (!IsAssertCityToCountry(model.City, model.Country, out nameCity, out nameCountry))
+            {
+                return false;
+            }
 
             var user = await userRepository.FindUserAsync(model.Id);
 
-            if (user == null) return false;
+            if (user == null)
+            {
+                return false;
+            }
 
             UserInfo updateUser = new UserInfo()
             {
@@ -168,14 +180,17 @@ namespace HomeWork.Services
             return await userRepository.Get.CountAsync();
         }
 
-        private bool IsRelationship(int idCity, int idCountry, out string nameCity, out string nameCountry)
+        private bool IsAssertCityToCountry(int idCity, int idCountry, out string nameCity, out string nameCountry)
         {
             nameCity = string.Empty;
             nameCountry = string.Empty;
 
             var country = userRepository.GetCountries().Where(c => c.ID == idCountry).Any();
 
-            if (!country) return false;
+            if (!country)
+            {
+                return false;
+            }
 
             bool result = userRepository.GetCities().Where(n => n.ID == idCity).Any(id => id.Country_ID.ID == idCountry);
 
@@ -189,9 +204,9 @@ namespace HomeWork.Services
                 Where(c => c.ID == idCity).
                 Single().Name;
 
-                return true;
+                return result;
             }
-            return false;
+            return result;
         }
 
     }
